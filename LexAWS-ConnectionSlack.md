@@ -6,7 +6,7 @@ Este guia fornece instruções detalhadas sobre como criar e configurar um bot A
 Acesse a pagina do [Slack Get Started](https://slack.com/get-started#landing) e siga as instruções para criar um _workspace_
 
 ## Criar um App no Slack
-Acesse a pagina do [Slack API Apps][(https://slack.com/get-started#landing](https://api.slack.com/apps)) e elique em "Create New App" para criar um novo app.
+Acesse a pagina do [Slack API Apps](https://api.slack.com/apps) e elique em "Create New App" para criar um novo app.
 
 ## Obter Credenciais do Slack
 No painel do seu app no Slack, vá para `App Credentials`, anote _Anote o Client ID_, _Client Secret_ e _Verification Token_.
