@@ -50,3 +50,10 @@ No painel do seu app no Slack, vá para `Interactivity & Shortcuts` e, no campo 
 
 ## Slack App: App Home
 No painel do seu app no Slack, vá para `App Home` e, no campo `Show Tabs` habilite o __Messages Tab__ (_Direct messages your app sends will show in this tab_).
+
+## Slack App: Manage Distribution
+No painel do seu app no Slack, vá para `Manage Distribution` e clique no botão __Add To Slack__ e PRONTOO!!!!
+
+
+
+
