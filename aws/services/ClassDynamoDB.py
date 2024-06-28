@@ -7,35 +7,16 @@ from uuid import uuid4
 
 class DynamoDBClass: 
     def __init__(self, dynamodb_table_name):
-        # Cria uma viaravel global Dynamodb table name
+
+        # Criação de nome da Dynamo Table
         self.dynamodb_table_name = dynamodb_table_name
 
-        # Importa as Credenciais da AWS
-        self.session = self.create_session()
-
         # Inicia a sessão do DynamoDB
-        self.dynamodb = self.session.resource('dynamodb', region_name='us-east-1')
+        self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
 
         # Inicia o serviço DynamoDB
-        self.dynamodb_client = self.session.client('dynamodb', region_name='us-east-1')
-
-
-    def create_session(self):
-        """
-        Cria uma sessão AWS utilizando as credenciais obtidas de aws_credentials.
-
-        :return: Uma sessão boto3
-        """
-        # Obtem as chaves de acesso da AWS
-        ACCESS_KEY, SECRET_KEY, SESSION_TOKEN = aws_credentials()
-
-        # Conecta com AWS por meio das credenciais
-        session = boto3.Session(
-            aws_access_key_id=ACCESS_KEY, 
-            aws_secret_access_key=SECRET_KEY,
-            aws_session_token=SESSION_TOKEN
-        )
-        return session
+        self.dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
+    
     
     def create_table_dynamodb(self):
         """
@@ -75,15 +56,16 @@ class DynamoDBClass:
 
                 print('LOG: Criação de Tabela de log concluída com sucesso.')
 
-            except (BotoCoreError, ClientError) as e:
+            except (BotoCoreError, ClientError) as e: # Caso ocorra um erro, imprime a mensagem de erro
                 print(f'Error: {e}')
+
         else:
             print('LOG: Tabela de log foi criada previamente.')            
 
 
 
     # Serviço de DynamoDB de cadastro de log
-    def log_register_dynamodb(self, phrase):
+    def log_register_dynamodb(self, unique_id, phrase, s3_url):
             """
             Registra um log no DynamoDB contendo informações da requisição e resposta.
 
@@ -91,23 +73,26 @@ class DynamoDBClass:
             :return: None
             """
             # Inicia o serviço de DynamoDB e acessa a tabela especificada
-            table = self.dynamodb.Table(self.dynamodb_table_name)        
+            table = self.dynamodb.Table(self.dynamodb_table_name)  
 
             # Configura os dados do log
             log_item = {
-                'id': str(uuid4()),  # Gera um ID único para o log
-                'timestamp': datetime.utcnow().isoformat(),  # Obtém o timestamp atual no formato ISO
-                'phrase': phrase,  # Dados da requisição
+                'id': unique_id,
+                'timestamp': datetime.utcnow().isoformat(),
+                'phrase': phrase,
+                'url_to_audio': s3_url,
+                'created_audio': datetime.utcnow().isoformat()
             }
                 
-            # Insere os dados do log na tabela do DynamoDB
-            try:
+            
+            try: # Insere os dados do log na tabela do DynamoDB
                 table.put_item(Item=log_item)
                 print("Dados do log inseridos no DynamoDB com sucesso")
-            except ClientError as e:
+            
+            except ClientError as e: # Caso ocorra um erro, imprime a mensagem de erro
                 print(f"Erro ao inserir os dados do log no DynamoDB: {e}")
 
-    def repeated_value_dynamodb(self, phrase):
+    def repeated_phrase_dynamodb(self, phrase):
         """
         Verifica se há uma frase repetida no DynamoDB.
 
@@ -115,7 +100,7 @@ class DynamoDBClass:
         :return: True se a frase for encontrada, False se não for encontrada, None em caso de erro.
         """
         # Inicializa o serviço DynamoDB e acessa a tabela especificada
-        table = self.dynamodb.Table(self.dynamodb_table_name)  
+        table = self.dynamodb.Table(self.dynamodb_table_name)
 
         # Usa a operação de scan com um filtro para encontrar itens com a frase especificada
         try:
@@ -123,18 +108,59 @@ class DynamoDBClass:
                 FilterExpression=Attr('phrase').eq(phrase)
             )
             items = response.get('Items', [])  # Obtém os itens retornados na resposta
+
+            # Se houver itens, a frase foi encontrada
             if items:
-                # Se houver itens, a frase foi encontrada
                 print(f"Frase '{phrase}' encontrada: {items}")
                 return True
+                
+            # Se nenhum item for encontrado, a frase não foi encontrada
             else:
-                # Se nenhum item for encontrado, a frase não foi encontrada
                 print(f"Frase '{phrase}' não encontrada.")
                 return False
-            
+        
+        # Em caso de erro, imprime a mensagem de erro e retorna None
         except ClientError as e:
-            # Em caso de erro, imprime a mensagem de erro e retorna None
+            print(f"Erro ao buscar a frase no DynamoDB: {e}")
+            return None
+    
+    def repeated_value_dynamodb(self, unique_id):
+        """
+        Verifica se a frase já foi convertida
+
+        :param unique_id: O unique_id a ser pesquisada no DynamoDB.
+        :return: True se a frase for encontrada, False se não for encontrada, None em caso de erro.
+        """
+         # Inicializa o serviço DynamoDB e acessa a tabela especificada
+        table = self.dynamodb.Table(self.dynamodb_table_name)
+        
+        
+        try: # Usa a operação de get_item com um filtro para encontrar itens com a frase especificada
+            response = table.get_item(Key={'id': unique_id}) # Obtém os itens retornados na resposta
+            return 'Item' in response
+        
+        except ClientError as e: # Em caso de erro, imprime a mensagem de erro e retorna None
             print(f"Erro ao buscar a frase no DynamoDB: {e}")
             return None
 
+    # Método para buscar o item no DynamoDB pelo ID
+    def get_item(self, unique_id):
+        table = self.dynamodb.Table(self.dynamodb_table_name)
+        
+        try: # Busca o item no DynamoDB pelo ID
+            response = table.get_item(Key={'id': unique_id})
+            return response.get('Item', {})
+            
+        except ClientError as e: # Caso ocorra um erro, retorna None
+            print(f"Erro ao buscar o item no DynamoDB: {e}")
+            return None
     
+    def list_dynamodb_tables(self):
+        try: # Lista as Tabelas do Dynamo
+            response = self.dynamodb_client.list_tables()
+            print("DynamoDB Tables:", response['TableNames'])
+        
+        except ClientError as e: # Caso ocorra um erro, retorna False
+            print(f"Error listing DynamoDB tables: {e}")
+            return False
+        return True
