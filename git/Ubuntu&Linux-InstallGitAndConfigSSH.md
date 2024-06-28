@@ -45,3 +45,13 @@ Agora você pode clonar o repositório usando SSH. Execute o seguinte comando no
 ```bash
 git clone git@github.com:XXXXXXXXXXX
 ```
+
+
+### Passo 5: Configurar UserName e Email 
+
+Estes comandos configuram seu nome de usuário e email de forma global, ou seja, para todos os repositórios Git em seu sistema:
+
+```sh
+git config --global user.name "Seu Nome"
+git config --global user.email "seu.email@exemplo.com"
+```
