@@ -15,24 +15,6 @@ class S3BucketClass:
         self.s3_client = boto3.client('s3')
          
     
-    def create_session(self):
-        """
-        Cria uma sessão AWS utilizando as credenciais obtidas de aws_credentials.
-
-        :return: Uma sessão boto3
-        """
-        # Obtem as chaves de acesso da AWS
-        ACCESS_KEY, SECRET_KEY, SESSION_TOKEN = aws_credentials()
-
-        # Conecta com AWS por meio das credenciais
-        session = boto3.Session(
-            aws_access_key_id=ACCESS_KEY, 
-            aws_secret_access_key=SECRET_KEY,
-            aws_session_token=SESSION_TOKEN
-        )
-        return session
-
-
     def create_s3_bucket(self):
         """
         Cria um bucket S3 com o nome especificado.
