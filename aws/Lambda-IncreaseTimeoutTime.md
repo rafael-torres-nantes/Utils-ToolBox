@@ -29,10 +29,10 @@ O valor de timeout de uma função Lambda define o tempo máximo que a função 
 2. **Atualize a Configuração da Função**:
    - Use o comando `update-function-configuration` para alterar o valor de timeout. Exemplo:
 
-     ```sh
-     aws lambda update-function-configuration \
-       --function-name my-function \
-       --timeout 120
+     ```bash
+      aws lambda update-function-configuration \
+        --function-name my-function \
+        --timeout 120
      ```
 
    - Substitua `my-function` pelo nome da sua função e `120` pelo valor desejado em segundos.
@@ -43,18 +43,18 @@ O valor de timeout de uma função Lambda define o tempo máximo que a função 
    - Atualize o arquivo `template.yaml` do seu projeto para incluir a propriedade `Timeout`.
 
      ```yaml
-     AWSTemplateFormatVersion: '2010-09-09'
-     Transform: AWS::Serverless-2016-10-31
-     Description: An AWS Serverless Application Model template describing your function.
-     Resources:
-       my-function:
-         Type: AWS::Serverless::Function
-         Properties:
-           CodeUri: .
-           Description: ''
-           MemorySize: 128
-           Timeout: 120
-           # Outras propriedades da função...
+      AWSTemplateFormatVersion: '2010-09-09'
+      Transform: AWS::Serverless-2016-10-31
+      Description: An AWS Serverless Application Model template describing your function.
+      Resources:
+        my-function:
+          Type: AWS::Serverless::Function
+          Properties:
+            CodeUri: .
+            Description: ''
+            MemorySize: 128
+            Timeout: 120
+            # Other function properties...
      ```
 
 2. **Implante a Função**:
