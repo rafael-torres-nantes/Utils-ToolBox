@@ -155,14 +155,16 @@ class S3BucketClass:
         """
     
         try:
+            success = True
             for root, dirs, files in os.walk(directory):
                 for file in files:
                     local_path = os.path.join(root, file)
                     s3_key = os.path.relpath(local_path, directory).replace("\\", "/")
     
                     if not upload_image_to_s3(local_path, bucket_name, s3_key):
-                        return False
-            return True
+                        success = False
+            
+            return success
     
         except Exception as e:
             print(f"Erro ao tentar fazer upload dos arquivos para o bucket {bucket_name}: {str(e)}")
