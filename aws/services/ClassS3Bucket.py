@@ -143,7 +143,30 @@ class S3BucketClass:
             else:
                 # Outros erros
                 print(f"Erro ao tentar o objeto {object_name} no bucket {bucket_name}: {error_code}")
-                return False
+                return False        
+
+    def upload_directory_to_s3(directory, bucket_name):
+        """
+        Faz o upload de todos os arquivos de um diretório para um bucket no S3.
+    
+        directory: diretório local contendo os arquivos a serem enviados
+        bucket_name: bucket para onde os arquivos serão enviados
+        return: True se todos os uploads foram bem sucedidos, False caso contrário
+        """
+    
+        try:
+            for root, dirs, files in os.walk(directory):
+                for file in files:
+                    local_path = os.path.join(root, file)
+                    s3_key = os.path.relpath(local_path, directory).replace("\\", "/")
+    
+                    if not upload_image_to_s3(local_path, bucket_name, s3_key):
+                        return False
+            return True
+    
+        except Exception as e:
+            print(f"Erro ao tentar fazer upload dos arquivos para o bucket {bucket_name}: {str(e)}")
+            return False
 
     # Função para obter os metadados de uma imagem no S3 e retornar o objeto de metadados
     def get_image_metadata(self, bucket, image_name):
