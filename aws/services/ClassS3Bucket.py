@@ -105,7 +105,7 @@ class S3BucketClass:
 
         return local_directory
 
-    def upload_image_to_s3(image_name, bucket_name, object_name=None):
+def upload_image_to_s3(self, image_name, object_name=None):
     
         """
         Faz o upload de uma imagem para o bucket no S3
@@ -123,8 +123,8 @@ class S3BucketClass:
     
         try:
             # Verifica se a imagem está presente no bucket
-            s3_client.head_object(Bucket=bucket_name, Key=object_name)
-            print(f"O arquivo {object_name} já existe no bucket {bucket_name}")
+            s3_client.head_object(Bucket=self.bucket_name, Key=object_name)
+            print(f"O arquivo {object_name} já existe no bucket {self.bucket_name}")
             return False
     
         except ClientError as e:
@@ -134,18 +134,18 @@ class S3BucketClass:
             if error_code == '404':
                 # objeto não existe no bucket então faz o upload
                 try: 
-                    s3_client.upload_file(image_name, bucket_name, object_name)
-                    print(f"Arquivo {object_name} enviado com sucesso para o bucket {bucket_name}")
+                    s3_client.upload_file(image_name, self.bucket_name, object_name)
+                    print(f"Arquivo {object_name} enviado com sucesso para o bucket {self.bucket_name}")
                     return True    
                 except NoCredentialsError:
                     print("Credenciais não encontradas")
                     return False
             else:
                 # Outros erros
-                print(f"Erro ao tentar o objeto {object_name} no bucket {bucket_name}: {error_code}")
+                print(f"Erro ao tentar o objeto {object_name} no bucket {self.bucket_name}: {error_code}")
                 return False        
 
-    def upload_directory_to_s3(directory, bucket_name):
+    def upload_directory_to_s3(self, directory):
         """
         Faz o upload de todos os arquivos de um diretório para um bucket no S3.
     
@@ -161,21 +161,21 @@ class S3BucketClass:
                     local_path = os.path.join(root, file)
                     s3_key = os.path.relpath(local_path, directory).replace("\\", "/")
     
-                    if not upload_image_to_s3(local_path, bucket_name, s3_key):
+                    if not self.upload_image_to_s3(local_path, self.bucket_name, s3_key):
                         success = False
             
             return success
     
         except Exception as e:
-            print(f"Erro ao tentar fazer upload dos arquivos para o bucket {bucket_name}: {str(e)}")
+            print(f"Erro ao tentar fazer upload dos arquivos para o bucket {self.bucket_name}: {str(e)}")
             return False
 
     # Função para obter os metadados de uma imagem no S3 e retornar o objeto de metadados
-    def get_image_metadata(self, bucket, image_name):
-        metadata = self.s3.head_object(Bucket=bucket, Key=image_name)
+    def get_image_metadata(self, image_name):
+        metadata = self.s3.head_object(Bucket=self.bucket_name, Key=image_name)
         return metadata
         
     # Função para gerar uma URL pública para acessar a imagem no S3
-    def get_signed_url(self, bucket, image_name):
-        url = f'https://{bucket}.s3.amazonaws.com/{image_name}'
+    def get_signed_url(self, image_name):
+        url = f'https://{self.bucket_name}.s3.amazonaws.com/{image_name}'
         return url
