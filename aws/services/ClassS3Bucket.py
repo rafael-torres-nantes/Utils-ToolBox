@@ -105,7 +105,7 @@ class S3BucketClass:
 
         return local_directory
 
-def upload_image_to_s3(self, image_name, object_name=None):
+    def upload_image_to_s3(self, image_name, object_name=None):
     
         """
         Faz o upload de uma imagem para o bucket no S3
@@ -161,7 +161,7 @@ def upload_image_to_s3(self, image_name, object_name=None):
                     local_path = os.path.join(root, file)
                     s3_key = os.path.relpath(local_path, directory).replace("\\", "/")
     
-                    if not self.upload_image_to_s3(local_path, self.bucket_name, s3_key):
+                    if not self.upload_image_to_s3(local_path, s3_key):
                         success = False
             
             return success
