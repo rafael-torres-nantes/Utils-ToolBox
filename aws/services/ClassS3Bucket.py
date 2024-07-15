@@ -40,8 +40,26 @@ class S3BucketClass:
             self.s3_client.head_bucket(Bucket=bucket_name)
             return True
         except ClientError: # Caso não exista, retorna False 
-            return False 
+            return False
+    
+    def list_s3_bucket(self):
+        """
+        Lista os nomes dos buckets S3 existentes.
+
+        :return: Lista de nomes de buckets
+        """
+        # Recupera a lista de buckets existentes
+        try:
+            response = self.s3_client.list_buckets()
             
+            # Exibe os nomes dos buckets
+            print("S3 Buckets:", [bucket['Name'] for bucket in response['Buckets']])
+
+        except ClientError as e:
+            print(f"Error listing S3 buckets: {e}")
+            return False
+        return True
+        
     def upload_s3_bucket(self, upload_file, filename):
         """
         Faz o upload de um arquivo para um bucket S3.
@@ -64,25 +82,6 @@ class S3BucketClass:
             logging.error(f"Erro ao fazer upload do arquivo: {e}")
             return None
             
-    def list_s3_bucket(self):
-        """
-        Lista os nomes dos buckets S3 existentes.
-
-        :return: Lista de nomes de buckets
-        """
-        # Recupera a lista de buckets existentes
-        try:
-            response = self.s3_client.list_buckets()
-            
-            # Exibe os nomes dos buckets
-            print("S3 Buckets:", [bucket['Name'] for bucket in response['Buckets']])
-
-        except ClientError as e:
-            print(f"Error listing S3 buckets: {e}")
-            return False
-        return True
-
-
     def extract_file_s3_bucket(self, object_key):
         """
         Faz o download de um arquivo de um bucket S3.
@@ -171,11 +170,11 @@ class S3BucketClass:
             return False
 
     # Função para obter os metadados de uma imagem no S3 e retornar o objeto de metadados
-    def get_image_metadata(self, image_name):
-        metadata = self.s3.head_object(Bucket=self.bucket_name, Key=image_name)
+    def get_image_metadata(self, bucket_name, image_name):
+        metadata = self.s3_client.head_object(Bucket=bucket_name, Key=image_name)
         return metadata
         
     # Função para gerar uma URL pública para acessar a imagem no S3
-    def get_signed_url(self, image_name):
-        url = f'https://{self.bucket_name}.s3.amazonaws.com/{image_name}'
+    def get_signed_url(self, bucket_name, image_name):
+        url = f'https://{bucket_name}.s3.amazonaws.com/{image_name}'
         return url
