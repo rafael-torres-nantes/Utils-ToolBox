@@ -2,6 +2,15 @@
 
 Este guia descreve como instalar o Serverless Framework CLI no Ubuntu.
 
+## Passo 0: Verificar a Instalação
+
+### Instalação expressa Serverless Framework CLI
+Para garantir que o Serverless Framework CLI foi instalado corretamente, verifique a versão instalada:
+```bash
+npm install -g serverless@3
+```
+
+
 ## Passo 1: Baixar e Instalar o Serverless Framework CLI
 
 ### Baixar e executar o script de instalação
