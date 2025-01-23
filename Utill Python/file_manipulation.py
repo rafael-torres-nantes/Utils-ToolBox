@@ -46,7 +46,7 @@ def search_extension_in_directory(directory, extension='.md'):
     for root, dirs, files in os.walk(directory):
 
         # Crie um filtro para selecionar apenas arquivos com a extensão especificada
-        extension_files = [os.path.join(root, file) for file in files if file.endswith(extension)]
+        extension_files.append([os.path.join(root, file) for file in files if file.endswith(extension)])
 
     return extension_files
 
