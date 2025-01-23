@@ -2,8 +2,6 @@ import boto3
 from datetime import datetime
 from boto3.dynamodb.conditions import Key, Attr
 from botocore.exceptions import BotoCoreError, ClientError
-from services.importAWSCredentials import aws_credentials
-from uuid import uuid4
 
 class DynamoDBClass: 
     def __init__(self, dynamodb_table_name):

@@ -1,4 +1,5 @@
 import boto3
+import logging
 from botocore.exceptions import BotoCoreError, ClientError
 
 # Classe para manipular o Polly e converter o texto em áudio
